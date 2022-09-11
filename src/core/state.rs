@@ -11,4 +11,5 @@ pub enum Trans {
     Pop,
     Set(Box<dyn State>),
     Push(Box<dyn State>),
+    Quit
 }
