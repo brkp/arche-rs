@@ -1,3 +1,4 @@
+use crate::core::Window;
 use crate::Texture;
 
 pub struct ContextBuilder {
@@ -15,7 +16,8 @@ pub struct ContextBuilder {
 }
 
 pub struct Context {
-    texture: Texture,
+    pub window: Window,
+    pub texture: Texture,
 }
 
 impl ContextBuilder {
@@ -44,7 +46,10 @@ impl ContextBuilder {
 }
 
 impl Context {
-    pub fn new(_config: &ContextBuilder) -> Self {
-        Self { texture: Texture::new(400, 400) }
+    pub fn new(config: &ContextBuilder) -> Result<Self, String> {
+        let window = Window::new(config)?;
+        let texture = Texture::new(config.width, config.height);
+
+        Ok(Self { window, texture })
     }
 }
