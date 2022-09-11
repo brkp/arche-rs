@@ -8,8 +8,12 @@ pub struct Color {
 
 impl Color {
     pub fn rgb(color: u32) -> Self {
+        Self::argb(color | 0xff000000)
+    }
+
+    pub fn argb(color: u32) -> Self {
         Self {
-            a: 255,
+            a: ((color >> 24) & 0xff) as u8,
             r: ((color >> 16) & 0xff) as u8,
             g: ((color >>  8) & 0xff) as u8,
             b: ((color >>  0) & 0xff) as u8,
