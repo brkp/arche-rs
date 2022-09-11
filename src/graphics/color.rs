@@ -1,9 +1,15 @@
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Color {
     a: u8,
     r: u8,
     g: u8,
     b: u8,
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self::argb(0xff000000)
+    }
 }
 
 impl Color {
