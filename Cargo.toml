@@ -1,0 +1,10 @@
+[package]
+name = "arche"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.sdl2]
+version = "0.35.2"
+features = ["bundled", "static-link"]
