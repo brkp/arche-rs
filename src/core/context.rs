@@ -1,5 +1,7 @@
-use crate::{Trans, Texture, core::Window};
+use sdl2::pixels::PixelFormatEnum;
+
 use crate::core::state::{State, StateManager};
+use crate::{core::SDLWindow, Texture, Trans};
 
 pub struct ContextBuilder {
     pub(crate) width: usize,
@@ -17,7 +19,7 @@ pub struct ContextBuilder {
 
 pub struct Context {
     pub config: ContextBuilder,
-    pub window: Window,
+    pub window: SDLWindow,
     pub texture: Texture,
 }
 
@@ -48,7 +50,7 @@ impl ContextBuilder {
 
 impl Context {
     pub fn new(config: ContextBuilder) -> Result<Self, String> {
-        let window = Window::new(&config)?;
+        let window = SDLWindow::new(&config)?;
         let texture = Texture::new(config.width, config.height);
 
         Ok(Self {
@@ -58,10 +60,31 @@ impl Context {
         })
     }
 
-    pub fn run(&mut self, initial_state: Box<dyn State>) {
-        let mut state_manager = StateManager::with(initial_state);
+    fn draw(&mut self, sdl_texture: &mut sdl2::render::Texture) {
+        sdl_texture
+            .with_lock(None, |buffer: &mut [u8], _pitch: usize| {
+                buffer.copy_from_slice(&self.texture.pixel);
+            })
+            .unwrap();
+
+        self.window.canvas.clear();
+        self.window.canvas.copy(sdl_texture, None, None).unwrap();
+        self.window.canvas.present();
+    }
+
+    pub fn run(&mut self, initial_state: Box<dyn State>) -> Result<(), String> {
         // assuming that there is no other instance of `EventPump`
         let mut event_pump = self.window.sdl.event_pump().unwrap();
+        let mut state_manager = StateManager::with(initial_state);
+
+        let texture_creator = self.window.canvas.texture_creator();
+        let mut sdl_texture = texture_creator
+            .create_texture_streaming(
+                PixelFormatEnum::ARGB32,
+                self.config.width as u32,
+                self.config.height as u32,
+            )
+            .map_err(|e| e.to_string())?;
 
         'outer: while state_manager.get_state_count() > 0 {
             let state = state_manager.get_active_state().unwrap();
@@ -80,12 +103,16 @@ impl Context {
                         continue 'outer;
                     }
                     Trans::Quit => break 'outer,
-                    Trans::None => ()
+                    Trans::None => (),
                 }
             }
 
             state.update(self);
             state.draw(self);
+
+            self.draw(&mut sdl_texture);
         }
+
+        Ok(())
     }
 }
