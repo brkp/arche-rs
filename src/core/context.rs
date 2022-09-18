@@ -60,16 +60,20 @@ impl Context {
         })
     }
 
-    fn draw(&mut self, sdl_texture: &mut sdl2::render::Texture) {
+    fn draw(&mut self, sdl_texture: &mut sdl2::render::Texture) -> Result<(), String> {
         sdl_texture
             .with_lock(None, |buffer: &mut [u8], _pitch: usize| {
                 buffer.copy_from_slice(&self.texture.pixel);
             })
-            .unwrap();
+            .map_err(|e| e.to_string())?;
 
         self.window.canvas.clear();
-        self.window.canvas.copy(sdl_texture, None, None).unwrap();
+        self.window.canvas
+            .copy(sdl_texture, None, None)
+            .map_err(|e| e.to_string())?;
         self.window.canvas.present();
+
+        Ok(())
     }
 
     pub fn run(&mut self, initial_state: Box<dyn State>) -> Result<(), String> {
@@ -110,7 +114,7 @@ impl Context {
             state.update(self);
             state.draw(self);
 
-            self.draw(&mut sdl_texture);
+            self.draw(&mut sdl_texture)?;
         }
 
         Ok(())

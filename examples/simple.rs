@@ -66,8 +66,6 @@ impl State for MenuState {
 
 fn main() {
     ContextBuilder::new("demo".to_string(), 480, 480)
-        .build()
-        .unwrap()
-        .run(Box::new(MenuState::new(0)))
-        .unwrap();
+        .build().unwrap()
+        .run(Box::new(MenuState::new(0))).unwrap();
 }
