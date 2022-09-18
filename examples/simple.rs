@@ -1,34 +1,35 @@
-use arche;
+use arche::{Context, ContextBuilder};
+use arche::{Event, State, Trans};
 
-struct MenuState;
-struct MainState;
+struct MenuState {
+    counter: u8,
+}
 
-impl arche::State for MenuState {
-    fn handle_events(&mut self, _ctx: &mut arche::Context) -> arche::Trans {
-        todo!()
+impl State for MenuState {
+    fn handle_event(&mut self, _ctx: &mut Context, event: Event) -> Trans {
+        match event {
+            Event::KeyDown {
+                keycode: Some(sdl2::keyboard::Keycode::P),
+                ..
+            } => Trans::Pop,
+            Event::KeyDown {
+                keycode: Some(sdl2::keyboard::Keycode::R),
+                ..
+            } => Trans::Push(Box::new(MenuState { counter: self.counter + 1 })),
+            _ => Trans::None,
+        }
     }
 
-    fn update(&mut self, _ctx: &mut arche::Context) {
-        todo!()
-    }
+    fn update(&mut self, _ctx: &mut Context) {}
 
-    fn draw(&mut self, _ctx: &mut arche::Context) {
-        todo!()
+    fn draw(&mut self, _ctx: &mut Context) {
+        println!("{}", self.counter);
     }
 }
 
-impl arche::core::state::State for MainState {
-    fn handle_events(&mut self, _ctx: &mut arche::Context) -> arche::Trans {
-        todo!()
-    }
-
-    fn update(&mut self, _ctx: &mut arche::Context) {
-        todo!()
-    }
-
-    fn draw(&mut self, _ctx: &mut arche::Context) {
-        todo!()
-    }
+fn main() {
+    ContextBuilder::new("demo".to_string(), 640, 480)
+        .build()
+        .unwrap()
+        .run(Box::new(MenuState { counter: 0 }));
 }
-
-fn main() {}
