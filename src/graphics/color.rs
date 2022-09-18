@@ -21,8 +21,12 @@ impl Color {
         Self {
             a: ((color >> 24) & 0xff) as u8,
             r: ((color >> 16) & 0xff) as u8,
-            g: ((color >>  8) & 0xff) as u8,
-            b: ((color >>  0) & 0xff) as u8,
+            g: ((color >> 8) & 0xff) as u8,
+            b: ((color >> 0) & 0xff) as u8,
         }
+    }
+
+    pub fn to_bytes(&self) -> [u8; 4] {
+        [self.a, self.r, self.g, self.b]
     }
 }
