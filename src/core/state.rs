@@ -1,5 +1,4 @@
-use sdl2::event::Event;
-use crate::core::context::Context;
+use crate::{Context, Event};
 
 pub trait State {
     fn handle_event(&mut self, ctx: &mut Context, event: Event) -> Trans;
@@ -26,9 +25,7 @@ pub struct StateManager {
 
 impl StateManager {
     pub fn new() -> Self {
-        Self {
-            stack: Vec::new(),
-        }
+        Self { stack: Vec::new() }
     }
 
     pub fn with(initial_state: Box<dyn State>) -> Self {
