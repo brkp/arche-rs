@@ -6,4 +6,4 @@ pub mod window;
 pub use context::{Context, ContextBuilder};
 pub use state::{State, Trans};
 
-pub(crate) use window::Window;
+pub(crate) use window::SDLWindow;

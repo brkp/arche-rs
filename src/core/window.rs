@@ -1,14 +1,13 @@
-use sdl2;
 use crate::ContextBuilder;
+use sdl2::{render::Canvas, video::Window, Sdl, VideoSubsystem};
 
-pub struct Window {
-    // TODO: this might not have to be pub at all
-    pub sdl: sdl2::Sdl,
-    pub video_subsystem: sdl2::VideoSubsystem,
-    pub window: sdl2::video::Window,
+pub struct SDLWindow {
+    pub sdl: Sdl,
+    pub video_subsystem: VideoSubsystem,
+    pub canvas: Canvas<Window>,
 }
 
-impl Window {
+impl SDLWindow {
     pub fn new(builder: &ContextBuilder) -> Result<Self, String> {
         let sdl = sdl2::init()?;
         let video_subsystem = sdl.video()?;
@@ -20,10 +19,12 @@ impl Window {
             .build()
             .map_err(|e| e.to_string())?;
 
+        let canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
+
         Ok(Self {
             sdl,
             video_subsystem,
-            window,
+            canvas,
         })
     }
 }
