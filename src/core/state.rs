@@ -1,4 +1,5 @@
-use crate::{Context, Event};
+use crate::Context;
+use sdl2::event::Event;
 
 pub trait State {
     fn handle_event(&mut self, ctx: &mut Context, event: Event) -> Trans;

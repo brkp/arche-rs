@@ -1,5 +1,7 @@
+use sdl2::{event::Event, keyboard::Keycode};
+
 use arche::{Context, ContextBuilder};
-use arche::{Event, State, Trans};
+use arche::{State, Trans};
 
 struct MenuState {
     counter: u8,
@@ -9,11 +11,11 @@ impl State for MenuState {
     fn handle_event(&mut self, _ctx: &mut Context, event: Event) -> Trans {
         match event {
             Event::KeyDown {
-                keycode: Some(sdl2::keyboard::Keycode::P),
+                keycode: Some(Keycode::P),
                 ..
             } => Trans::Pop,
             Event::KeyDown {
-                keycode: Some(sdl2::keyboard::Keycode::R),
+                keycode: Some(Keycode::R),
                 ..
             } => Trans::Push(Box::new(MenuState { counter: self.counter + 1 })),
             _ => Trans::None,
