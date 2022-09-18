@@ -1,12 +1,11 @@
 use sdl2;
-use crate::core::ContextBuilder;
+use crate::ContextBuilder;
 
 pub struct Window {
     // TODO: this might not have to be pub at all
     pub sdl: sdl2::Sdl,
     pub video_subsystem: sdl2::VideoSubsystem,
     pub window: sdl2::video::Window,
-    pub event_pump: sdl2::EventPump,
 }
 
 impl Window {
@@ -21,13 +20,10 @@ impl Window {
             .build()
             .map_err(|e| e.to_string())?;
 
-        let event_pump = sdl.event_pump()?;
-        
         Ok(Self {
-            sdl ,
+            sdl,
             video_subsystem,
             window,
-            event_pump
         })
     }
 }
