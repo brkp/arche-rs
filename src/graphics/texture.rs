@@ -17,6 +17,8 @@ impl Texture {
 
     pub fn set_pixel(&mut self, x: usize, y: usize, color: Color) {
         let index = (x + self.w * y) * 4;
-        self.pixel[index..index + 4].copy_from_slice(&color.to_bytes());
+        if index + 4 <= self.pixel.len() {
+            self.pixel[index..index + 4].copy_from_slice(&color.to_bytes());
+        }
     }
 }
