@@ -3,7 +3,7 @@ use std::io::Read;
 
 use sdl2::{event::Event, keyboard::Keycode};
 
-use arche::graphics::Color;
+use arche::graphics::{Color, draw};
 use arche::{Context, ContextBuilder};
 use arche::{State, Trans};
 
@@ -18,7 +18,7 @@ impl MenuState {
         let mut cbuf = [0u8; 4];
         file.read_exact(&mut cbuf).unwrap();
 
-        println!("{}", counter);
+        println!("current state: {}", counter);
 
         Self {
             color: Color::argb(u32::from_be_bytes(cbuf)),
@@ -30,7 +30,7 @@ impl MenuState {
 impl Drop for MenuState {
     fn drop(&mut self) {
         if self.counter > 0 {
-            println!("{}", self.counter - 1);
+            println!("current state: {}", self.counter - 1);
         }
     }
 }
@@ -61,6 +61,9 @@ impl State for MenuState {
         for pixel in ctx.texture.pixel.chunks_exact_mut(4) {
             pixel.copy_from_slice(&self.color.to_bytes());
         }
+
+        draw::line(ctx, 0, 0, 479, 479, Color::default());
+        draw::line(ctx, 479, 0, 0, 479, Color::default());
     }
 }
 
