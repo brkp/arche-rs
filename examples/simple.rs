@@ -7,9 +7,23 @@ use arche::graphics::{Color, draw};
 use arche::{Context, ContextBuilder};
 use arche::{State, Trans};
 
+struct Rect {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+}
+
 struct MenuState {
     color: Color,
     counter: u32,
+    rect: Rect,
+}
+
+impl Rect {
+    pub fn new(x: i32, y: i32, w: i32, h: i32) -> Self {
+        Self { x, y, w, h }
+    }
 }
 
 impl MenuState {
@@ -23,6 +37,7 @@ impl MenuState {
         Self {
             color: Color::argb(u32::from_be_bytes(cbuf)),
             counter,
+            rect: Rect::new(100, 100, 70, 70)
         }
     }
 }
@@ -55,15 +70,28 @@ impl State for MenuState {
         }
     }
 
-    fn update(&mut self, _ctx: &mut Context) {}
+    fn update(&mut self, _ctx: &mut Context) {
+        self.rect.x += 1;
+        self.rect.y += 1;
+    }
 
     fn draw(&mut self, ctx: &mut Context) {
-        for pixel in ctx.texture.pixel.chunks_exact_mut(4) {
-            pixel.copy_from_slice(&self.color.to_bytes());
-        }
+        draw::fill(ctx, self.color);
 
         draw::line(ctx, 0, 0, 479, 479, Color::default());
         draw::line(ctx, 479, 0, 0, 479, Color::default());
+        draw::line(ctx, 0, 479, 100, 0, Color::default());
+
+        draw::line(ctx, 100, 0, 100, 479, Color::default());
+        draw::line(ctx, 0, 100, 479, 100, Color::default());
+
+        for y in self.rect.y..=self.rect.y + self.rect.h {
+            draw::line(
+                ctx,
+                self.rect.x, y,
+                self.rect.x + self.rect.w, y,
+                Color::default());
+        }
     }
 }
 
