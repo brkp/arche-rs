@@ -1,5 +1,4 @@
-use crate::graphics::draw;
-use crate::{Color, Context, Point, Texture};
+use crate::{graphics::draw, Color, Context, Point};
 
 // ugly as and inefficient hell
 fn interpolate(i0: i32, d0: i32, i1: i32, d1: i32) -> Vec<i32> {
@@ -11,7 +10,7 @@ fn interpolate(i0: i32, d0: i32, i1: i32, d1: i32) -> Vec<i32> {
     let m = (d1 - d0) as f32 / (i1 - i0) as f32;
     let mut d = d0 as f32;
 
-    for x in i0..=i1 {
+    for _ in i0..=i1 {
         values.push(d as i32);
         d += m;
     }

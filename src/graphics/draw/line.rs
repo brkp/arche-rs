@@ -1,4 +1,4 @@
-use crate::{Color, Context, Point, Texture};
+use crate::{Color, Context, Point};
 
 // TODO: use the Point type
 pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
