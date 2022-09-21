@@ -16,9 +16,10 @@ struct Rect {
 
 struct MenuState {
     color: Color,
-    counter: u32,
     rect: Rect,
 }
+
+struct PauseState;
 
 impl Rect {
     pub fn new(x: i32, y: i32, w: i32, h: i32) -> Self {
@@ -27,26 +28,35 @@ impl Rect {
 }
 
 impl MenuState {
-    fn new(counter: u32) -> Self {
+    fn new() -> Self {
         let mut file = File::open("/dev/urandom").unwrap();
         let mut cbuf = [0u8; 4];
         file.read_exact(&mut cbuf).unwrap();
 
-        println!("current state: {}", counter);
-
         Self {
+            rect: Rect::new(100, 100, 70, 70),
             color: Color::argb(u32::from_be_bytes(cbuf)),
-            counter,
-            rect: Rect::new(100, 100, 70, 70)
         }
     }
 }
 
-impl Drop for MenuState {
-    fn drop(&mut self) {
-        if self.counter > 0 {
-            println!("current state: {}", self.counter - 1);
+impl State for PauseState {
+    fn handle_event(&mut self, _ctx: &mut Context, event: Event) -> Trans {
+        match event {
+            Event::Quit { .. } => Trans::Quit,
+            Event::KeyDown {
+                keycode: Some(Keycode::P),
+                ..
+            } => Trans::Pop,
+            _ => Trans::None,
         }
+    }
+
+    fn update(&mut self, _ctx: &mut Context) {}
+
+    fn draw(&mut self, ctx: &mut Context) {
+        draw::line(ctx, 0, 0, 479, 479, Color::default());
+        draw::line(ctx, 0, 479, 479, 0, Color::default());
     }
 }
 
@@ -57,31 +67,23 @@ impl State for MenuState {
             Event::KeyDown {
                 keycode: Some(Keycode::P),
                 ..
-            } => Trans::Pop,
-            Event::KeyDown {
-                keycode: Some(Keycode::Q),
-                ..
-            } => Trans::Quit,
-            Event::KeyDown {
-                keycode: Some(Keycode::R),
-                ..
-            } => Trans::Push(Box::new(MenuState::new(self.counter + 1))),
+            } => Trans::Push(Box::new(PauseState {})),
             _ => Trans::None,
         }
     }
 
-    fn update(&mut self, _ctx: &mut Context) {
+    fn update(&mut self, ctx: &mut Context) {
         self.rect.x += 1;
         self.rect.y += 1;
+
+        if self.rect.x >= ctx.texture.w as i32 { self.rect.x = -self.rect.w; }
+        if self.rect.y >= ctx.texture.h as i32 { self.rect.y = -self.rect.h; }
     }
 
     fn draw(&mut self, ctx: &mut Context) {
         draw::fill(ctx, self.color);
 
-        draw::line(ctx, 0, 0, 479, 479, Color::default());
-        draw::line(ctx, 479, 0, 0, 479, Color::default());
         draw::line(ctx, 0, 479, 100, 0, Color::default());
-
         draw::line(ctx, 100, 0, 100, 479, Color::default());
         draw::line(ctx, 0, 100, 479, 100, Color::default());
 
@@ -98,5 +100,5 @@ impl State for MenuState {
 fn main() {
     ContextBuilder::new("demo".to_string(), 480, 480)
         .build().unwrap()
-        .run(Box::new(MenuState::new(0))).unwrap();
+        .run(Box::new(MenuState::new())).unwrap();
 }
