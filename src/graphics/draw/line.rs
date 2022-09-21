@@ -1,10 +1,11 @@
-use crate::{Color, Context, Texture};
+use crate::{Color, Context, Point, Texture};
 
-pub fn draw(ctx: &mut Context, x0: i32, y0: i32, x1: i32, y1: i32, color: Color) {
-    let mut x0 = x0;
-    let mut x1 = x1;
-    let mut y0 = y0;
-    let mut y1 = y1;
+// TODO: use the Point type
+pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
+    let mut x0 = p0.x;
+    let mut x1 = p1.x;
+    let mut y0 = p0.y;
+    let mut y1 = p1.y;
 
     let dx = x0 - x1;
     let dy = y0 - y1;
@@ -15,21 +16,20 @@ pub fn draw(ctx: &mut Context, x0: i32, y0: i32, x1: i32, y1: i32, color: Color)
             std::mem::swap(&mut y0, &mut y1);
         }
 
-        let m = dy/dx;
+        let m = dy / dx;
         let mut y = y0;
 
         for x in x0..=x1 {
             ctx.texture.set_pixel(x as usize, y as usize, color);
             y += m;
         }
-    }
-    else {
+    } else {
         if y0 > y1 {
             std::mem::swap(&mut x0, &mut x1);
             std::mem::swap(&mut y0, &mut y1);
         }
 
-        let m = dx/dy;
+        let m = dx / dy;
         let mut x = x0;
 
         for y in y0..=y1 {
