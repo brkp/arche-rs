@@ -26,6 +26,7 @@ impl Texture {
         }
     }
 
+    #[inline(always)]
     pub fn set_pixel(&mut self, x: usize, y: usize, color: Color) {
         if x < self.w && y < self.h {
             let index = (x + self.w * y) * 4;
