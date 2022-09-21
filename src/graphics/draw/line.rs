@@ -7,8 +7,8 @@ pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
     let mut y0 = p0.y;
     let mut y1 = p1.y;
 
-    let dx = x0 - x1;
-    let dy = y0 - y1;
+    let dx = (x0 - x1) as f32;
+    let dy = (y0 - y1) as f32;
 
     if dx.abs() > dy.abs() {
         if x0 > x1 {
@@ -17,7 +17,7 @@ pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
         }
 
         let m = dy / dx;
-        let mut y = y0;
+        let mut y = y0 as f32;
 
         for x in x0..=x1 {
             ctx.texture.set_pixel(x as usize, y as usize, color);
@@ -30,7 +30,7 @@ pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
         }
 
         let m = dx / dy;
-        let mut x = x0;
+        let mut x = x0 as f32;
 
         for y in y0..=y1 {
             ctx.texture.set_pixel(x as usize, y as usize, color);
