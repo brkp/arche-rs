@@ -1,5 +1,3 @@
-// TODO: implement a macro to easyly construct a point
-
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Point {
     pub x: i32,

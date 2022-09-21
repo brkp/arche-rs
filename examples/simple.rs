@@ -4,7 +4,7 @@ use std::io::Read;
 use sdl2::{event::Event, keyboard::Keycode};
 
 use arche::graphics::{draw, Color};
-use arche::{Context, ContextBuilder, Point};
+use arche::{pt, Context, ContextBuilder, Point};
 use arche::{State, Trans};
 
 struct Rect {
@@ -55,18 +55,8 @@ impl State for PauseState {
     fn update(&mut self, _ctx: &mut Context) {}
 
     fn draw(&mut self, ctx: &mut Context) {
-        draw::line(
-            ctx,
-            Point::new(0, 0),
-            Point::new(479, 479),
-            Color::default(),
-        );
-        draw::line(
-            ctx,
-            Point::new(0, 479),
-            Point::new(479, 0),
-            Color::default(),
-        );
+        draw::line(ctx, pt!(0, 0), pt!(479, 479), Color::default());
+        draw::line(ctx, pt!(0, 479), pt!(479, 0), Color::default());
     }
 }
 
@@ -99,36 +89,21 @@ impl State for MenuState {
 
         draw::triangle(
             ctx,
-            Point::new(480 / 2, 0),
-            Point::new(0, 479),
-            Point::new(479, 479),
+            pt!(480 / 2, 0),
+            pt!(0, 479),
+            pt!(479, 479),
             Color::rgb(0x39a7a6),
         );
 
-        draw::line(
-            ctx,
-            Point::new(0, 479),
-            Point::new(100, 0),
-            Color::default(),
-        );
-        draw::line(
-            ctx,
-            Point::new(100, 0),
-            Point::new(100, 479),
-            Color::default(),
-        );
-        draw::line(
-            ctx,
-            Point::new(0, 100),
-            Point::new(479, 100),
-            Color::default(),
-        );
+        draw::line(ctx, pt!(0, 479), pt!(100, 0), Color::default());
+        draw::line(ctx, pt!(100, 0), pt!(100, 479), Color::default());
+        draw::line(ctx, pt!(0, 100), pt!(479, 100), Color::default());
 
         for y in self.rect.y..=self.rect.y + self.rect.h {
             draw::line(
                 ctx,
-                Point::new(self.rect.x, y),
-                Point::new(self.rect.x + self.rect.w, y),
+                pt!(self.rect.x, y),
+                pt!(self.rect.x + self.rect.w, y),
                 Color::default(),
             );
         }
