@@ -21,9 +21,15 @@ fn interpolate(i0: i32, d0: i32, i1: i32, d1: i32) -> Vec<i32> {
 
 pub fn draw(ctx: &mut Context, mut p0: Point, mut p1: Point, mut p2: Point, color: Color) {
     // sorting the points by their `y` values
-    if p1.y < p0.y { std::mem::swap(&mut p1, &mut p0); }
-    if p2.y < p0.y { std::mem::swap(&mut p2, &mut p0); }
-    if p2.y < p1.y { std::mem::swap(&mut p2, &mut p1); }
+    if p1.y < p0.y {
+        std::mem::swap(&mut p1, &mut p0);
+    }
+    if p2.y < p0.y {
+        std::mem::swap(&mut p2, &mut p0);
+    }
+    if p2.y < p1.y {
+        std::mem::swap(&mut p2, &mut p1);
+    }
 
     let mut x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
     let mut x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
@@ -36,8 +42,7 @@ pub fn draw(ctx: &mut Context, mut p0: Point, mut p1: Point, mut p2: Point, colo
     let m = x012.len() / 2;
     let (x_left, x_right) = if x02[m] < x012[m] {
         (x02, x012)
-    }
-    else {
+    } else {
         (x012, x02)
     };
 

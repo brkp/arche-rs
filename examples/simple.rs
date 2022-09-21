@@ -3,8 +3,8 @@ use std::io::Read;
 
 use sdl2::{event::Event, keyboard::Keycode};
 
-use arche::graphics::{Color, draw};
-use arche::{Point, Context, ContextBuilder};
+use arche::graphics::{draw, Color};
+use arche::{Context, ContextBuilder, Point};
 use arche::{State, Trans};
 
 struct Rect {
@@ -55,8 +55,18 @@ impl State for PauseState {
     fn update(&mut self, _ctx: &mut Context) {}
 
     fn draw(&mut self, ctx: &mut Context) {
-         draw::line(ctx, Point::new(0, 0), Point::new(479, 479), Color::default());
-         draw::line(ctx, Point::new(0, 479), Point::new(479, 0), Color::default());
+        draw::line(
+            ctx,
+            Point::new(0, 0),
+            Point::new(479, 479),
+            Color::default(),
+        );
+        draw::line(
+            ctx,
+            Point::new(0, 479),
+            Point::new(479, 0),
+            Color::default(),
+        );
     }
 }
 
@@ -76,8 +86,12 @@ impl State for MenuState {
         self.rect.x += 1;
         self.rect.y += 1;
 
-        if self.rect.x >= ctx.texture.w as i32 { self.rect.x = -self.rect.w; }
-        if self.rect.y >= ctx.texture.h as i32 { self.rect.y = -self.rect.h; }
+        if self.rect.x >= ctx.texture.w as i32 {
+            self.rect.x = -self.rect.w;
+        }
+        if self.rect.y >= ctx.texture.h as i32 {
+            self.rect.y = -self.rect.h;
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) {
@@ -85,27 +99,46 @@ impl State for MenuState {
 
         draw::triangle(
             ctx,
-            Point::new(480/2, 0),
+            Point::new(480 / 2, 0),
             Point::new(0, 479),
             Point::new(479, 479),
-            Color::rgb(0x39a7a6));
+            Color::rgb(0x39a7a6),
+        );
 
-        draw::line(ctx, Point::new(0, 479), Point::new(100, 0), Color::default());
-        draw::line(ctx, Point::new(100, 0), Point::new(100, 479), Color::default());
-        draw::line(ctx, Point::new(0, 100), Point::new(479, 100), Color::default());
+        draw::line(
+            ctx,
+            Point::new(0, 479),
+            Point::new(100, 0),
+            Color::default(),
+        );
+        draw::line(
+            ctx,
+            Point::new(100, 0),
+            Point::new(100, 479),
+            Color::default(),
+        );
+        draw::line(
+            ctx,
+            Point::new(0, 100),
+            Point::new(479, 100),
+            Color::default(),
+        );
 
         for y in self.rect.y..=self.rect.y + self.rect.h {
             draw::line(
                 ctx,
                 Point::new(self.rect.x, y),
                 Point::new(self.rect.x + self.rect.w, y),
-                Color::default());
+                Color::default(),
+            );
         }
     }
 }
 
 fn main() {
     ContextBuilder::new("demo".to_string(), 480, 480)
-        .build().unwrap()
-        .run(Box::new(MenuState::new())).unwrap();
+        .build()
+        .unwrap()
+        .run(Box::new(MenuState::new()))
+        .unwrap();
 }

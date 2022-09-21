@@ -68,7 +68,8 @@ impl Context {
             .map_err(|e| e.to_string())?;
 
         self.window.canvas.clear();
-        self.window.canvas
+        self.window
+            .canvas
             .copy(sdl_texture, None, None)
             .map_err(|e| e.to_string())?;
         self.window.canvas.present();
@@ -110,12 +111,13 @@ impl Context {
                         continue 'outer;
                     }
                     Trans::Quit => {
-                        let duration = scan
-                            .iter()
-                            .sum::<std::time::Duration>();
+                        let duration = scan.iter().sum::<std::time::Duration>();
                         println!("total scan time: {:?}", duration);
                         println!("frame scan time: {:?}", duration / scan.len() as u32);
-                        println!("scan frame rate: {} fps", 1000000 / (duration / scan.len() as u32).as_micros());
+                        println!(
+                            "scan frame rate: {} fps",
+                            1000000 / (duration / scan.len() as u32).as_micros()
+                        );
                         break 'outer;
                     }
                     Trans::None => (),

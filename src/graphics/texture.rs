@@ -1,5 +1,5 @@
-use crate::Context;
 use crate::graphics::Color;
+use crate::Context;
 
 pub struct Texture {
     pub pixel: Vec<u8>,
@@ -8,7 +8,8 @@ pub struct Texture {
 }
 
 pub fn fill(ctx: &mut Context, color: Color) {
-    ctx.texture.pixel
+    ctx.texture
+        .pixel
         .chunks_exact_mut(4)
         .for_each(|c| c.copy_from_slice(&color.to_bytes()));
 }
