@@ -90,7 +90,10 @@ impl Context {
             )
             .map_err(|e| e.to_string())?;
 
+        let mut scan = Vec::<std::time::Duration>::new();
         'outer: while state_manager.get_state_count() > 0 {
+            let start = std::time::Instant::now();
+
             let state = state_manager.get_active_state().unwrap();
             for event in event_pump.poll_iter() {
                 match state.handle_event(self, event) {
@@ -106,7 +109,15 @@ impl Context {
                         state_manager.push_state(new_state);
                         continue 'outer;
                     }
-                    Trans::Quit => break 'outer,
+                    Trans::Quit => {
+                        let duration = scan
+                            .iter()
+                            .sum::<std::time::Duration>();
+                        println!("total scan time: {:?}", duration);
+                        println!("frame scan time: {:?}", duration / scan.len() as u32);
+                        println!("scan frame rate: {} fps", 1000000 / (duration / scan.len() as u32).as_micros());
+                        break 'outer;
+                    }
                     Trans::None => (),
                 }
             }
@@ -115,6 +126,7 @@ impl Context {
             state.draw(self);
 
             self.draw(&mut sdl_texture)?;
+            scan.push(std::time::Instant::now() - start);
         }
 
         Ok(())
