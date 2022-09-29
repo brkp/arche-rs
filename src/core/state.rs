@@ -1,8 +1,8 @@
 use crate::Context;
-use sdl2::event::Event;
+use winit_input_helper::WinitInputHelper;
 
 pub trait State {
-    fn handle_event(&mut self, ctx: &mut Context, event: Event) -> Trans;
+    fn handle_events(&mut self, ctx: &mut Context, input: &WinitInputHelper) -> Trans;
     fn update(&mut self, ctx: &mut Context);
     fn draw(&mut self, ctx: &mut Context);
     // TODO:

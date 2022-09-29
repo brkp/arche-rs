@@ -1,5 +1,3 @@
-pub use sdl2;
-
 pub mod core;
 pub mod graphics;
 
