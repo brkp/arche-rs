@@ -1,6 +1,5 @@
 use crate::{Color, Context, Point};
 
-// TODO: use the Point type
 pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
     let mut x0 = p0.x;
     let mut x1 = p1.x;
