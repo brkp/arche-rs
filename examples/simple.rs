@@ -3,6 +3,7 @@ use std::time::SystemTime;
 use arche::graphics::{draw, Color};
 use arche::{pt, Context, ContextBuilder, Point};
 use arche::{State, Trans};
+
 use winit::event::VirtualKeyCode;
 use winit_input_helper::WinitInputHelper;
 
@@ -21,41 +22,21 @@ mod rand {
     }
 }
 
-struct Rect {
-    pub x: i32,
-    pub y: i32,
-    pub w: i32,
-    pub h: i32,
-}
+const W: usize = 480;
+const H: usize = 480;
+const C: usize = 40;
 
-struct MenuState {
-    rect: Rect,
-    color: Color,
+struct MainState {
+    rect: (Point, i32, i32)
 }
-
 struct PauseState;
-
-impl Rect {
-    pub fn new(x: i32, y: i32, w: i32, h: i32) -> Self {
-        Self { x, y, w, h }
-    }
-}
-
-impl MenuState {
-    fn new() -> Self {
-        Self {
-            rect: Rect::new(100, 100, 70, 70),
-            color: Color::rgba(rand::u32()),
-        }
-    }
-}
 
 impl State for PauseState {
     fn update(&mut self, _ctx: &mut Context) {}
 
     fn draw(&mut self, ctx: &mut Context) {
-        draw::line(ctx, pt!(0, 0), pt!(479, 479), Color::default());
-        draw::line(ctx, pt!(0, 479), pt!(479, 0), Color::default());
+        draw::line(ctx, pt!(0, 0), pt!(479, 479), Color::rgba(0x00ff0060));
+        draw::line(ctx, pt!(0, 479), pt!(479, 0), Color::rgba(0x00ff0060));
     }
 
     fn handle_events(&mut self, _ctx: &mut Context, input: &WinitInputHelper) -> Trans {
@@ -70,7 +51,7 @@ impl State for PauseState {
     }
 }
 
-impl State for MenuState {
+impl State for MainState {
     fn handle_events(&mut self, _ctx: &mut Context, input: &WinitInputHelper) -> Trans {
         if input.key_pressed(VirtualKeyCode::Q) || input.quit() {
             return Trans::Quit;
@@ -83,48 +64,33 @@ impl State for MenuState {
     }
 
     fn update(&mut self, ctx: &mut Context) {
-        self.rect.x += 1;
-        self.rect.y += 1;
+        self.rect.0.x += 1;
+        self.rect.0.y += 1;
 
-        if self.rect.x >= ctx.texture.w as i32 {
-            self.rect.x = -self.rect.w;
+        if self.rect.0.x >= ctx.texture.w as i32 {
+            self.rect.0.x = -self.rect.1;
         }
-        if self.rect.y >= ctx.texture.h as i32 {
-            self.rect.y = -self.rect.h;
+        if self.rect.0.y >= ctx.texture.h as i32 {
+            self.rect.0.y = -self.rect.2;
         }
     }
 
     fn draw(&mut self, ctx: &mut Context) {
-        draw::fill(ctx, self.color);
+        // draw::clear(ctx);
+        // draw::fill(ctx, Color::rgb(0x6495ed));
 
-        draw::triangle(
-            ctx,
-            pt!(480 / 2, 0),
-            pt!(0, 479),
-            pt!(479, 479),
-            Color::rgb(0x39a7a6),
-        );
-
-        draw::triangle(
-            ctx,
-            pt!(31, 31),
-            pt!(31, 151),
-            pt!(191, 151),
-            Color::rgb(0x000000),
-        );
-
-        draw::line(ctx, pt!(0, 479), pt!(100, 0), Color::default());
-        draw::line(ctx, pt!(100, 0), pt!(100, 479), Color::default());
-        draw::line(ctx, pt!(0, 100), pt!(479, 100), Color::default());
-
-        for y in self.rect.y..=self.rect.y + self.rect.h {
-            draw::line(
-                ctx,
-                pt!(self.rect.x, y),
-                pt!(self.rect.x + self.rect.w, y),
-                Color::default(),
-            );
+        for y in (0..H).step_by(C) {
+            for x in (0..W).step_by(C) {
+                let color = if ((x / C) + (y / C)) % 2 == 0 {
+                    Color::rgb(0x3d4757)
+                } else {
+                    Color::rgb(0x486860)
+                };
+                draw::rect(ctx, pt!(x as i32, y as i32), C as i32, C as i32, color);
+            }
         }
+
+        draw::rect(ctx, self.rect.0, self.rect.1, self.rect.2, Color::rgba(0x6495ed80));
     }
 }
 
@@ -136,8 +102,8 @@ fn main() {
             .as_secs() as u32,
     );
 
-    ContextBuilder::new("demo".to_string(), 480, 480)
+    ContextBuilder::new("demo".to_string(), W, H)
         .build()
         .unwrap()
-        .run(Box::new(MenuState::new()))
+        .run(Box::new(MainState { rect: (pt!(0, 0), 100, 100) }))
 }
