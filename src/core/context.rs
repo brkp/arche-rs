@@ -56,6 +56,7 @@ impl ContextBuilder {
 impl Context {
     pub fn new(config: ContextBuilder) -> Result<Self, Error> {
         let event_loop = EventLoop::new();
+        // TODO: handle errors
         let window = {
             let size = LogicalSize::new(config.width as f64, config.height as f64);
             WindowBuilder::new()
@@ -93,10 +94,13 @@ impl Context {
         let mut input_helper = WinitInputHelper::new();
         let mut state_manager = StateManager::with(initial_state);
 
+        let mut scan = Vec::<std::time::Duration>::new();
+
         self.event_loop.take().unwrap().run(move |event, _, control_flow| {
             control_flow.set_poll();
 
             if input_helper.update(&event) {
+                let start = std::time::Instant::now();
                 let mut state = state_manager.get_active_state();
                 if state.is_none() {
                     *control_flow = ControlFlow::Exit;
@@ -118,6 +122,13 @@ impl Context {
                         return;
                     }
                     Trans::Quit => {
+                        let duration = scan.iter().sum::<std::time::Duration>();
+                        println!("total scan time: {:?}", duration);
+                        println!("frame scan time: {:?}", duration / scan.len() as u32);
+                        println!(
+                            "scan frame rate: {} fps",
+                            1000000 / (duration / scan.len() as u32).as_micros()
+                        );
                         *control_flow = ControlFlow::Exit;
                         return;
                     }
@@ -127,6 +138,7 @@ impl Context {
                 state.draw(&mut self);
 
                 self.draw();
+                scan.push(std::time::Instant::now() - start);
             }
         });
     }
