@@ -1,7 +1,8 @@
-pub mod color;
+mod color;
+mod point;
+mod texture;
+
 pub mod draw;
-pub mod point;
-pub mod texture;
 
 pub use color::Color;
 pub use point::Point;

@@ -1,5 +1,5 @@
-pub mod context;
-pub mod state;
+mod context;
+mod state;
 
 pub use context::{Context, ContextBuilder};
-pub use state::{State, Trans};
+pub use state::{State, StateManager, Trans};
