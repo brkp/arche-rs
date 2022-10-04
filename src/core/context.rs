@@ -150,8 +150,9 @@ impl Context {
     where
         F: FnOnce(&mut Context) -> Box<dyn State>,
     {
+        let init_state = init(&mut self);
+        let mut state_manager = StateManager::with(&mut self, init_state);
         let mut input_helper = WinitInputHelper::new();
-        let mut state_manager = StateManager::with(init(&mut self));
 
         let mut scan = Vec::<std::time::Duration>::new();
 
@@ -172,15 +173,15 @@ impl Context {
 
                     match state.handle_events(&mut self, &input_helper) {
                         Trans::Pop => {
-                            state_manager.pop_state();
+                            state_manager.pop_state(&mut self);
                             return;
                         }
                         Trans::Set(new_state) => {
-                            state_manager.set_state(new_state);
+                            state_manager.set_state(&mut self, new_state);
                             return;
                         }
                         Trans::Push(new_state) => {
-                            state_manager.push_state(new_state);
+                            state_manager.push_state(&mut self, new_state);
                             return;
                         }
                         Trans::Quit => {
