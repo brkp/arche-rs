@@ -1,11 +1,11 @@
 use std::time::SystemTime;
 
-use arche::graphics::{draw, Color};
-use arche::{pt, Context, ContextBuilder, Point};
-use arche::{State, Trans};
+use arche::prelude::*;
+use arche::winit::event::VirtualKeyCode;
+use arche::winit_input_helper::WinitInputHelper;
 
-use winit::event::VirtualKeyCode;
-use winit_input_helper::WinitInputHelper;
+const W: usize = 480;
+const H: usize = 480;
 
 mod rand {
     extern "C" {
@@ -20,14 +20,14 @@ mod rand {
     pub fn u32() -> u32 {
         unsafe { rand() as u32 }
     }
+
+    pub fn range(a: i32, b: i32) -> i32 {
+        return (u32() as i32 % (b - a + 1)) + a;
+    }
 }
 
-const W: usize = 480;
-const H: usize = 480;
-const C: usize = 40;
-
 struct MainState {
-    rect: (Point, i32, i32)
+    rect: (Point, i32, i32),
 }
 struct PauseState;
 
@@ -76,21 +76,36 @@ impl State for MainState {
     }
 
     fn draw(&mut self, ctx: &mut Context) {
-        // draw::clear(ctx);
-        // draw::fill(ctx, Color::rgb(0x6495ed));
+        draw::fill(ctx, Color::rgb(0x212121));
 
-        for y in (0..H).step_by(C) {
-            for x in (0..W).step_by(C) {
-                let color = if ((x / C) + (y / C)) % 2 == 0 {
-                    Color::rgb(0x3d4757)
-                } else {
-                    Color::rgb(0x486860)
-                };
-                draw::rect(ctx, pt!(x as i32, y as i32), C as i32, C as i32, color);
-            }
+        // for y in (0..H).step_by(C) {
+        //     for x in (0..W).step_by(C) {
+        //         let color = if ((x / C) + (y / C)) % 2 == 0 {
+        //             Color::rgb(0xffffff)
+        //         } else {
+        //             Color::rgb(0x000000)
+        //         };
+        //         draw::rect(ctx, pt!(x as i32, y as i32), C as i32, C as i32, color);
+        //     }
+        // }
+
+        for _ in 0..100 {
+            draw::triangle(
+                ctx,
+                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
+                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
+                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
+                Color::rgb(rand::u32()),
+            );
         }
 
-        draw::rect(ctx, self.rect.0, self.rect.1, self.rect.2, Color::rgba(0x6495ed80));
+        draw::rect(
+            ctx,
+            self.rect.0,
+            self.rect.1,
+            self.rect.2,
+            Color::rgba(0x6495ed80),
+        );
     }
 }
 
@@ -105,5 +120,7 @@ fn main() {
     ContextBuilder::new("demo".to_string(), W, H)
         .build()
         .unwrap()
-        .run(Box::new(MainState { rect: (pt!(0, 0), 100, 100) }))
+        .run(Box::new(MainState {
+            rect: (pt!(0, 0), 100, 100),
+        }))
 }
