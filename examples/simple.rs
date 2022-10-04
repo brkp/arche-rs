@@ -120,7 +120,9 @@ fn main() {
     ContextBuilder::new("demo".to_string(), W, H)
         .build()
         .unwrap()
-        .run(Box::new(MainState {
-            rect: (pt!(0, 0), 100, 100),
-        }))
+        .run(|_| {
+            Box::new(MainState {
+                rect: (pt!(0, 0), 100, 100),
+            })
+        })
 }

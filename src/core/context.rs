@@ -90,56 +90,62 @@ impl Context {
         self.pixels.render().unwrap();
     }
 
-    pub fn run(mut self, initial_state: Box<dyn State>) {
+    pub fn run<F>(mut self, init: F)
+    where
+        F: FnOnce(&mut Context) -> Box<dyn State>,
+    {
         let mut input_helper = WinitInputHelper::new();
-        let mut state_manager = StateManager::with(initial_state);
+        let mut state_manager = StateManager::with(init(&mut self));
 
         let mut scan = Vec::<std::time::Duration>::new();
 
-        self.event_loop.take().unwrap().run(move |event, _, control_flow| {
-            control_flow.set_poll();
+        self.event_loop
+            .take()
+            .unwrap()
+            .run(move |event, _, control_flow| {
+                control_flow.set_poll();
 
-            if input_helper.update(&event) {
-                let start = std::time::Instant::now();
-                let mut state = state_manager.get_active_state();
-                if state.is_none() {
-                    *control_flow = ControlFlow::Exit;
-                    return;
-                };
-                let state = state.take().unwrap();
-
-                match state.handle_events(&mut self, &input_helper) {
-                    Trans::Pop => {
-                        state_manager.pop_state();
-                        return;
-                    }
-                    Trans::Set(new_state) => {
-                        state_manager.set_state(new_state);
-                        return;
-                    }
-                    Trans::Push(new_state) => {
-                        state_manager.push_state(new_state);
-                        return;
-                    }
-                    Trans::Quit => {
-                        let duration = scan.iter().sum::<std::time::Duration>();
-                        println!("total scan time: {:?}", duration);
-                        println!("frame scan time: {:?}", duration / scan.len() as u32);
-                        println!(
-                            "scan frame rate: {} fps",
-                            1000000 / (duration / scan.len() as u32).as_micros()
-                        );
+                if input_helper.update(&event) {
+                    let start = std::time::Instant::now();
+                    let mut state = state_manager.get_active_state();
+                    if state.is_none() {
                         *control_flow = ControlFlow::Exit;
                         return;
-                    }
-                    Trans::None => (),
-                }
-                state.update(&mut self);
-                state.draw(&mut self);
+                    };
+                    let state = state.take().unwrap();
 
-                self.draw();
-                scan.push(std::time::Instant::now() - start);
-            }
-        });
+                    match state.handle_events(&mut self, &input_helper) {
+                        Trans::Pop => {
+                            state_manager.pop_state();
+                            return;
+                        }
+                        Trans::Set(new_state) => {
+                            state_manager.set_state(new_state);
+                            return;
+                        }
+                        Trans::Push(new_state) => {
+                            state_manager.push_state(new_state);
+                            return;
+                        }
+                        Trans::Quit => {
+                            let duration = scan.iter().sum::<std::time::Duration>();
+                            println!("total scan time: {:?}", duration);
+                            println!("frame scan time: {:?}", duration / scan.len() as u32);
+                            println!(
+                                "scan frame rate: {} fps",
+                                1000000 / (duration / scan.len() as u32).as_micros()
+                            );
+                            *control_flow = ControlFlow::Exit;
+                            return;
+                        }
+                        Trans::None => (),
+                    }
+                    state.update(&mut self);
+                    state.draw(&mut self);
+
+                    self.draw();
+                    scan.push(std::time::Instant::now() - start);
+                }
+            });
     }
 }
