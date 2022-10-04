@@ -1,7 +1,7 @@
 use pixels::{Error, Pixels, PixelsBuilder, SurfaceTexture};
 use winit::dpi::LogicalSize;
 use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::WindowBuilder;
+use winit::window::{CursorGrabMode, WindowBuilder};
 use winit_input_helper::WinitInputHelper;
 
 use crate::core::state::{State, StateManager};
@@ -13,10 +13,10 @@ pub struct ContextBuilder {
     pub height: usize,
     pub title: String,
     pub vsync: bool,
+    pub grab_mouse: bool,
+    pub show_mouse: bool,
     // TODO
     // stuff to add:
-    // grab mouse
-    // show mouse
     // resizable
     // maximized minimized
 }
@@ -36,6 +36,8 @@ impl ContextBuilder {
             width,
             height,
             vsync: false,
+            grab_mouse: false,
+            show_mouse: true,
         }
     }
 
@@ -55,12 +57,23 @@ impl ContextBuilder {
         self
     }
 
+    pub fn show_mouse(&mut self, show_mouse: bool) -> &mut Self {
+        self.show_mouse = show_mouse;
+        self
+    }
+
+    pub fn grab_mouse(&mut self, grab_mouse: bool) -> &mut Self {
+        self.grab_mouse = grab_mouse;
+        self
+    }
+
     pub fn build(&self) -> Result<Context, Error> {
         Context::new(self.clone())
     }
 }
 
 impl Context {
+    // TODO: create an error enum for encapsulating different types of errors
     pub fn new(config: ContextBuilder) -> Result<Self, Error> {
         let event_loop = EventLoop::new();
         // TODO: handle errors
@@ -73,6 +86,7 @@ impl Context {
                 .build(&event_loop)
                 .unwrap()
         };
+
         let texture = Texture::new(config.width, config.height);
         let pixels = {
             let win_size = window.inner_size();
@@ -81,6 +95,15 @@ impl Context {
                 .enable_vsync(config.vsync)
                 .build()?
         };
+
+        // TODO: proper error handling
+        if config.grab_mouse {
+            window
+                .set_cursor_grab(CursorGrabMode::Confined)
+                .or_else(|_e| window.set_cursor_grab(CursorGrabMode::Locked))
+                .unwrap();
+        }
+        window.set_cursor_visible(config.show_mouse);
 
         Ok(Self {
             config,
@@ -95,6 +118,32 @@ impl Context {
         // TODO: error handling
         self.pixels.get_frame().copy_from_slice(&self.texture.pixel);
         self.pixels.render().unwrap();
+    }
+
+    pub fn set_show_mouse(&mut self, value: bool) {
+        self.config.show_mouse = value;
+        self.window.set_cursor_visible(value);
+    }
+
+    pub fn set_grab_mouse(&mut self, value: bool) {
+        self.config.grab_mouse = value;
+        if value == false {
+            self.window.set_cursor_grab(CursorGrabMode::None).unwrap();
+        }
+        else {
+            self.window
+                .set_cursor_grab(CursorGrabMode::Confined)
+                .or_else(|_e| self.window.set_cursor_grab(CursorGrabMode::Locked))
+                .unwrap();
+        }
+    }
+
+    pub fn toggle_show_mouse(&mut self) {
+        self.set_show_mouse(!self.config.show_mouse);
+    }
+
+    pub fn toggle_grab_mouse(&mut self) {
+        self.set_grab_mouse(!self.config.grab_mouse);
     }
 
     pub fn run<F>(mut self, init: F)

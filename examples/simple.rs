@@ -39,12 +39,19 @@ impl State for PauseState {
         draw::line(ctx, pt!(0, 479), pt!(479, 0), Color::rgba(0x00ff0060));
     }
 
-    fn handle_events(&mut self, _ctx: &mut Context, input: &WinitInputHelper) -> Trans {
+    fn handle_events(&mut self, ctx: &mut Context, input: &WinitInputHelper) -> Trans {
         if input.key_pressed(VirtualKeyCode::Q) || input.quit() {
             return Trans::Quit;
         }
         if input.key_pressed(VirtualKeyCode::P) {
+            ctx.set_show_mouse(false);
+            ctx.set_grab_mouse(true);
+
             return Trans::Pop;
+        }
+        if input.key_pressed(VirtualKeyCode::LShift) {
+            ctx.toggle_show_mouse();
+            ctx.toggle_grab_mouse();
         }
 
         Trans::None
@@ -108,6 +115,8 @@ fn main() {
 
     ContextBuilder::new("demo".to_string(), W, H)
         .vsync(true)
+        .grab_mouse(true)
+        .show_mouse(false)
         .build()
         .unwrap()
         .run(|_| {
