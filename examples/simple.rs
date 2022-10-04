@@ -78,17 +78,6 @@ impl State for MainState {
     fn draw(&mut self, ctx: &mut Context) {
         draw::fill(ctx, Color::rgb(0x212121));
 
-        // for y in (0..H).step_by(C) {
-        //     for x in (0..W).step_by(C) {
-        //         let color = if ((x / C) + (y / C)) % 2 == 0 {
-        //             Color::rgb(0xffffff)
-        //         } else {
-        //             Color::rgb(0x000000)
-        //         };
-        //         draw::rect(ctx, pt!(x as i32, y as i32), C as i32, C as i32, color);
-        //     }
-        // }
-
         for _ in 0..100 {
             draw::triangle(
                 ctx,

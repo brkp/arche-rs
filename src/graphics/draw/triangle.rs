@@ -1,57 +1,50 @@
-use crate::{graphics::draw, Color, Context, Point};
+use crate::{graphics::draw, pt, Color, Context, Point};
+use std::mem::swap;
 
-// ugly as and inefficient hell
-fn interpolate(i0: i32, d0: i32, i1: i32, d1: i32) -> Vec<i32> {
-    if i0 == i1 {
-        return vec![d0];
+fn fill_bottom_flat_triangle(ctx: &mut Context, v0: Point, v1: Point, v2: Point, color: Color) {
+    let im1 = (v1.x as f32 - v0.x as f32) / (v1.y as f32 - v0.y as f32);
+    let im2 = (v2.x as f32 - v0.x as f32) / (v2.y as f32 - v0.y as f32);
+
+    let mut cx1 = v0.x as f32;
+    let mut cx2 = v0.x as f32;
+
+    for y in v0.y..=v1.y {
+        draw::line(ctx, pt!(cx1 as i32, y), pt!(cx2 as i32, y), color);
+        cx1 += im1;
+        cx2 += im2;
     }
-
-    let mut values = Vec::new();
-    let m = (d1 - d0) as f32 / (i1 - i0) as f32;
-    let mut d = d0 as f32;
-
-    for _ in i0..=i1 {
-        values.push(d as i32);
-        d += m;
-    }
-
-    values
 }
 
-pub fn draw(ctx: &mut Context, mut p0: Point, mut p1: Point, mut p2: Point, color: Color) {
-    // sorting the points by their `y` values
-    if p1.y < p0.y {
-        std::mem::swap(&mut p1, &mut p0);
-    }
-    if p2.y < p0.y {
-        std::mem::swap(&mut p2, &mut p0);
-    }
-    if p2.y < p1.y {
-        std::mem::swap(&mut p2, &mut p1);
-    }
+fn fill_top_flat_triangle(ctx: &mut Context, v0: Point, v1: Point, v2: Point, color: Color) {
+    let im1 = (v2.x as f32 - v0.x as f32) / (v2.y as f32 - v0.y as f32);
+    let im2 = (v2.x as f32 - v1.x as f32) / (v2.y as f32 - v1.y as f32);
 
-    let mut x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
-    let mut x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
-    let x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+    let mut cx1 = v2.x as f32;
+    let mut cx2 = v2.x as f32;
 
-    x01.pop();
-    x01.append(&mut x12);
-    let x012 = x01;
+    for y in (v0.y..=v2.y).rev() {
+        draw::line(ctx, pt!(cx1 as i32, y), pt!(cx2 as i32, y), color);
+        cx1 -= im1;
+        cx2 -= im2;
+    }
+}
 
-    let m = x012.len() / 2;
-    let (x_left, x_right) = if x02[m] < x012[m] {
-        (x02, x012)
+pub fn draw(ctx: &mut Context, mut v0: Point, mut v1: Point, mut v2: Point, color: Color) {
+    if v1.y < v0.y { swap(&mut v1, &mut v0); }
+    if v2.y < v0.y { swap(&mut v2, &mut v0); }
+    if v2.y < v1.y { swap(&mut v2, &mut v1); }
+
+    if v2.y == v1.y {
+        fill_bottom_flat_triangle(ctx, v0, v1, v2, color);
+    } else if v0.y == v1.y {
+        fill_top_flat_triangle(ctx, v0, v1, v2, color);
     } else {
-        (x012, x02)
-    };
-
-    for y in p0.y..=p2.y {
-        for x in x_left[(y - p0.y) as usize]..=x_right[(y - p0.y) as usize] {
-            ctx.texture.set_pixel(x as usize, y as usize, color);
-        }
+        let v3 = pt!(
+            v0.x + ((v2.x as f32 - v0.x as f32) * (v1.y as f32 - v0.y as f32)
+                / (v2.y as f32 - v0.y as f32)) as i32,
+            v1.y
+        );
+        fill_bottom_flat_triangle(ctx, v0, v1, v3, color);
+        fill_top_flat_triangle(ctx, v1, v3, v2, color);
     }
-
-    draw::line(ctx, p0, p1, color);
-    draw::line(ctx, p0, p2, color);
-    draw::line(ctx, p1, p2, color);
 }
