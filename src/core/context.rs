@@ -7,13 +7,14 @@ use winit_input_helper::WinitInputHelper;
 use crate::core::state::{State, StateManager};
 use crate::{Texture, Trans};
 
+#[derive(Debug, Clone)]
 pub struct ContextBuilder {
-    pub(crate) width: usize,
-    pub(crate) height: usize,
-    pub(crate) title: String,
+    pub width: usize,
+    pub height: usize,
+    pub title: String,
+    pub vsync: bool,
     // TODO
     // stuff to add:
-    // vsync
     // grab mouse
     // show mouse
     // resizable
@@ -34,6 +35,7 @@ impl ContextBuilder {
             title,
             width,
             height,
+            vsync: false,
         }
     }
 
@@ -48,8 +50,13 @@ impl ContextBuilder {
         self
     }
 
-    pub fn build(self) -> Result<Context, Error> {
-        Context::new(self)
+    pub fn vsync(&mut self, vsync: bool) -> &mut Self {
+        self.vsync = vsync;
+        self
+    }
+
+    pub fn build(&self) -> Result<Context, Error> {
+        Context::new(self.clone())
     }
 }
 
@@ -71,7 +78,7 @@ impl Context {
             let win_size = window.inner_size();
             let surface_texture = SurfaceTexture::new(win_size.width, win_size.height, &window);
             PixelsBuilder::new(config.width as u32, config.height as u32, surface_texture)
-                .enable_vsync(false)
+                .enable_vsync(config.vsync)
                 .build()?
         };
 

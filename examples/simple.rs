@@ -107,6 +107,7 @@ fn main() {
     );
 
     ContextBuilder::new("demo".to_string(), W, H)
+        .vsync(true)
         .build()
         .unwrap()
         .run(|_| {
