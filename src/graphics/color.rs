@@ -3,17 +3,17 @@ pub struct Color(u32);
 
 impl Default for Color {
     fn default() -> Self {
-        Self { 0: 0x000000ff }
+        Self (0x000000ff)
     }
 }
 
 impl Color {
     pub fn rgb(color: u32) -> Self {
-        Self { 0: (color << 8) | 0xff }
+        Self ((color << 8) | 0xff)
     }
 
     pub fn rgba(color: u32) -> Self {
-        Self { 0: color }
+        Self (color)
     }
 
     pub fn bytes(&self) -> [u8; 4] {
@@ -35,9 +35,9 @@ impl std::ops::Add for Color {
         let mut rb = c1 & 0xff00ff;
         let mut g  = c1 & 0x00ff00;
 
-        rb += ((c2 & 0xff00ff) - rb) * a >> 8;
-        g  += ((c2 & 0x00ff00) -  g) * a >> 8;
+        rb += (((c2 & 0xff00ff) - rb) * a) >> 8;
+        g  += (((c2 & 0x00ff00) -  g) * a) >> 8;
 
-        Self { 0: (((rb & 0xff00ff) | (g & 0x00ff00)) << 8) | a }
+        Self ((((rb & 0xff00ff) | (g & 0x00ff00)) << 8) | a)
     }
 }

@@ -127,7 +127,7 @@ impl Context {
 
     pub fn set_grab_mouse(&mut self, value: bool) {
         self.config.grab_mouse = value;
-        if value == false {
+        if !value {
             self.window.set_cursor_grab(CursorGrabMode::None).unwrap();
         }
         else {

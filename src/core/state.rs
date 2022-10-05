@@ -20,15 +20,12 @@ pub enum Trans {
     Quit,
 }
 
+#[derive(Default)]
 pub struct StateManager {
     stack: Vec<Box<dyn State>>,
 }
 
 impl StateManager {
-    pub fn new() -> Self {
-        Self { stack: Vec::new() }
-    }
-
     pub fn with(ctx: &mut Context, mut initial_state: Box<dyn State>) -> Self {
         initial_state.on_start(ctx);
 
