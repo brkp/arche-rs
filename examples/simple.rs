@@ -85,8 +85,8 @@ impl State for MainState {
     fn draw(&mut self, ctx: &mut Context) {
         draw::fill(ctx, Color::rgb(0x212121));
 
-        for _ in 0..100 {
-            draw::triangle(
+        for _ in 0..50 {
+            draw::triangle_filled(
                 ctx,
                 pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
                 pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
@@ -115,7 +115,7 @@ fn main() {
 
     ContextBuilder::new("demo".to_string(), W, H)
         .vsync(true)
-        .grab_mouse(true)
+        // .grab_mouse(true)
         .show_mouse(false)
         .build()
         .unwrap()
