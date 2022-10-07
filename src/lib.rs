@@ -3,7 +3,7 @@ mod graphics;
 
 pub use crate::core::{Context, ContextBuilder};
 pub use crate::core::{State, StateManager, Trans};
-pub use crate::graphics::{Color, Point, Texture};
+pub use crate::graphics::{draw, Color, Point, Texture};
 
 // re-exports
 pub use winit;
