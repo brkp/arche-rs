@@ -29,7 +29,14 @@ fn fill_top_flat_triangle(ctx: &mut Context, v0: Point, v1: Point, v2: Point, co
     }
 }
 
-pub fn draw(ctx: &mut Context, mut v0: Point, mut v1: Point, mut v2: Point, color: Color) {
+pub fn draw(ctx: &mut Context, v0: Point, v1: Point, v2: Point, color: Color) {
+    draw::line(ctx, v0, v1, color);
+    draw::line(ctx, v0, v2, color);
+    draw::line(ctx, v1, v2, color);
+
+}
+
+pub fn draw_filled(ctx: &mut Context, mut v0: Point, mut v1: Point, mut v2: Point, color: Color) {
     if v1.y < v0.y { swap(&mut v1, &mut v0); }
     if v2.y < v0.y { swap(&mut v2, &mut v0); }
     if v2.y < v1.y { swap(&mut v2, &mut v1); }

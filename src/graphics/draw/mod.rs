@@ -6,4 +6,4 @@ pub use crate::graphics::texture::{clear, fill};
 
 pub use line::draw as line;
 pub use rect::draw as rect;
-pub use triangle::draw as triangle;
+pub use triangle::{draw as triangle, draw_filled as triangle_filled};
