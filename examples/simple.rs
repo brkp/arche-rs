@@ -21,13 +21,13 @@ mod rand {
         unsafe { rand() as u32 }
     }
 
-    pub fn range(a: i32, b: i32) -> i32 {
-        return (u32() as i32 % (b - a + 1)) + a;
+    pub fn range(a: u32, b: u32) -> u32 {
+        return (u32() % (b - a + 1)) + a;
     }
 }
 
 struct MainState {
-    rect: (Point, i32, i32),
+    rect: (Point, u32, u32),
 }
 struct PauseState;
 
@@ -74,11 +74,11 @@ impl State for MainState {
         self.rect.0.x += 1;
         self.rect.0.y += 1;
 
-        if self.rect.0.x >= ctx.texture.w as i32 {
-            self.rect.0.x = -self.rect.1;
+        if self.rect.0.x >= ctx.texture.w as u32 {
+            self.rect.0.x = 0;
         }
-        if self.rect.0.y >= ctx.texture.h as i32 {
-            self.rect.0.y = -self.rect.2;
+        if self.rect.0.y >= ctx.texture.h as u32 {
+            self.rect.0.y = 0;
         }
     }
 
@@ -86,11 +86,11 @@ impl State for MainState {
         draw::fill(ctx, Color::rgb(0x212121));
 
         for _ in 0..50 {
-            draw::triangle_filled(
+            draw::triangle(
                 ctx,
-                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
-                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
-                pt!(rand::range(100, W as i32 - 100), rand::range(100, H as i32 - 100)),
+                pt!(rand::range(100, W as u32 - 100), rand::range(100, H as u32 - 100)),
+                pt!(rand::range(100, W as u32 - 100), rand::range(100, H as u32 - 100)),
+                pt!(rand::range(100, W as u32 - 100), rand::range(100, H as u32 - 100)),
                 Color::rgb(rand::u32()),
             );
         }
@@ -114,8 +114,7 @@ fn main() {
     );
 
     ContextBuilder::new("demo".to_string(), W, H)
-        .vsync(true)
-        // .grab_mouse(true)
+        // .vsync(true)
         .show_mouse(false)
         .build()
         .unwrap()
