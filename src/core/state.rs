@@ -38,7 +38,6 @@ impl StateManager {
         if let Some(mut state) = self.stack.pop() {
             state.on_stop(ctx);
         }
-
         if let Some(new_state) = self.get_active_state() {
             new_state.on_resume(ctx);
         }
@@ -48,16 +47,15 @@ impl StateManager {
         if let Some(mut prev_state) = self.stack.pop() {
             prev_state.on_stop(ctx);
         }
-
         state.on_start(ctx);
         self.stack.push(state);
+
     }
 
     pub fn push_state(&mut self, ctx: &mut Context, mut state: Box<dyn State>) {
         if let Some(prev_state) = self.get_active_state() {
             prev_state.on_pause(ctx);
         }
-
         state.on_start(ctx);
         self.stack.push(state);
     }

@@ -1,6 +1,7 @@
 use crate::{Color, Context, Point};
 
-pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
+#[inline(always)]
+pub(crate) fn draw_not_clamped(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
     let mut x0 = p0.x as f32;
     let mut x1 = p1.x as f32;
     let mut y0 = p0.y as f32;
@@ -36,4 +37,11 @@ pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
             x += m;
         }
     }
+}
+
+pub fn draw(ctx: &mut Context, p0: Point, p1: Point, color: Color) {
+    let p0 = p0.clamp(ctx.config.width as u32, ctx.config.height as u32);
+    let p1 = p1.clamp(ctx.config.width as u32, ctx.config.height as u32);
+
+    draw_not_clamped(ctx, p0, p1, color);
 }
